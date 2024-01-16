@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  dup-backup:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-16T17:06:04.727945+13:00"
+    description: A Helm chart for Kubernetes
+    digest: 63a59a5355db4d33dcf9152de52c5bffea7b58f8caa1bbbb0900d4f9863930db
+    name: dup-backup
+    type: application
+    urls:
+    - https://timdawson264.github.io/helm-charts/dup-backup-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-01-16T17:06:04.727298+13:00"

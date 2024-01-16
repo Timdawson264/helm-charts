@@ -1,0 +1,3 @@
+
+A CronJob has been created in namespace {{.Release.namespace}} {{ include "dup-backup.fullname" . }}
+kubectl create job --from=cronjob/{{ include "dup-backup.fullname" . }} <name of job>

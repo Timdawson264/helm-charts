@@ -1,0 +1,83 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "dup-backup.fullname" . }}
+  labels:
+    {{- include "dup-backup.labels" . | nindent 4 }}
+spec:
+  schedule: "{{ .Values.schedule }}"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          {{- with .Values.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          labels:
+            {{- include "dup-backup.selectorLabels" . | nindent 12 }}
+        spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          containers:
+            - name: {{ .Chart.Name }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              env:
+                - name: BACKUP_DESTINATION
+                  value: "{{.Values.destination}}"
+                - name: BACKUP_ARGS
+                  value: "{{.Values.extra_args}}"
+                - name: AWS_CONFIG_FILE
+                  value: "/secret/awsconfig"
+              volumeMounts:
+                    - mountPath: /data/
+                      name: data
+                      readOnly: true
+                      {{- with .Values.data_subpath }}
+                      subPath: {{.}}
+                      {{- end }}
+                    - mountPath: /archive/
+                      name: data
+                      subPath: .duplicity
+                    - mountPath: /secret/
+                      name: secret
+                      readOnly: true
+                    - mountPath: /tmp/
+                      name: temp
+          volumes:
+              - name: data
+                persistentVolumeClaim:
+                  claimName: "{{.Values.data_pvc}}"
+              - name: secret
+                secret:
+                  secretName: "{{ .Values.secret }}"
+              - name: temp
+                emptyDir:
+                  medium: Memory
+                  sizeLimit: "{{ .Values.tempsize }}"
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

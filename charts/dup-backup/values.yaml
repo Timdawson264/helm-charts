@@ -1,0 +1,61 @@
+
+#Duplicity job options.
+schedule: "@daily"
+data_pvc: "pvc_to_backup"
+#Set if you want to backup a subpath in the pvc
+data_subpath: ""
+
+#If using aws the secret should contain key awsconfig with full aws config AWS_CONFIG_FILE env points to this file 
+secret: nameofsecter_containging_AWSConfig
+
+#Script args PVC will be mounted at /data secret at /secret
+destination: "s3+boto:://this.is.an.example/test"
+extra_args: ""
+
+#In memory temp space to for duplicity to put volumes before uploading
+tempsize: 512Mi
+
+#Example to backup ReadWriteOnce, So the job runs on the correct node, also improves caching.
+# affinity: 
+#   podAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#       - labelSelector:
+#           matchExpressions:
+#             - key: app
+#               operator: In
+#               values:
+#                 - ${DC_NAME}
+#         topologyKey: kubernetes.io/hostname
+
+image:
+  repository: quay.io/tidawson/duplicity
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+  # fsGroup: 2000
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  #runAsNonRoot: true
+  #runAsUser: 1000
+  #readOnlyRootFilesystem: true
+resources: 
+  limits:
+    cpu: 250m
+    memory: 128Mi
+  requests:
+    cpu: 10m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+

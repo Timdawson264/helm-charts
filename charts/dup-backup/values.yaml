@@ -2,11 +2,15 @@
 #Duplicity job options.
 schedule: "@daily"
 data_pvc: "pvc_to_backup"
+
 #Set if you want to backup a subpath in the pvc
 data_subpath: ""
 
 #If using aws the secret should contain key awsconfig with full aws config AWS_CONFIG_FILE env points to this file 
-secret: nameofsecter_containging_AWSConfig
+# keys
+# awsconfig = full aws config file
+# gpgkey.pub = any keys to import into keychain.
+secret: secret_name
 
 #Script args PVC will be mounted at /data secret at /secret
 destination: "s3+boto:://this.is.an.example/test"

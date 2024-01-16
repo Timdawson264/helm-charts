@@ -3,7 +3,8 @@
 schedule: "@daily"
 data_pvc: "pvc_to_backup"
 
-#Set if you want to backup a subpath in the pvc
+#Set if you want to backup a subpath in the pvc, 
+#the metadata is always stored in the root of the PVC under .duplicity
 data_subpath: ""
 
 #If using aws the secret should contain key awsconfig with full aws config AWS_CONFIG_FILE env points to this file 
